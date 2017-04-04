@@ -56,6 +56,7 @@ def CreateEye(drw,i=0,d=0,lt=50):
 # Main eye function
 def Eye():    
     global disp
+    global blinking
     i=randint(50,200)
     while True:
         CreateEye(disp.buffer,0,0,50)
