@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
-
 import math
 from PIL import Image
 from PIL import ImageDraw
