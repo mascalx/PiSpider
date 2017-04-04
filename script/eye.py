@@ -13,8 +13,8 @@ blinkpos=0 # Frame position for eye blinking
 blinkdir=1 # Direction of animation (1 -> closing, -1 -> opening)
 blinking=False # Blinking time
 blinkspd=10 # Speed of blinking
-eye = Image.open("eye6.png") # Eye to be frawn
-lid = Image.open("lid.png") # Lid base image
+eye = Image.open("img/eye6.png") # Eye to be frawn
+lid = Image.open("img/lid.png") # Lid base image
 # Setup the display    
 disp = GLCD.TFT()		# Create TFT LCD display class.
 disp.initialize()		# Initialize display.
