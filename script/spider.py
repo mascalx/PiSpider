@@ -56,13 +56,18 @@ def Rotate(angle,spd):
     Facing=(Facing-(angle*(np.sign(spd))))%360
     
 # Returns the angles of the brightest spot in the panoramic frame (x = horizontal, y = vertical)
-def FindBrightestSpot(img):
+def FindBrightestSpot():
     gray = cv2.cvtColor(dewarp.panorama, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (11, 11), 0)
     minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
     X = ((dewarp.Wd-maxLoc[0])*360)/dewarp.Wd # Offset to be added to fix start position of the panorama
     Y = ((dewarp.Hd-maxLoc[0])*30)/dewarp.Hd # Should be fixed after computing the right vertical FOV of the panorama
     return X,Y
+
+# Returns the averahe luminosity of the panorama
+def AverageBrightness():
+    gray = cv2.cvtColor(dewarp.panorama, cv2.COLOR_BGR2GRAY)
+    return np.mean(gray)
 
 # Main program
 if __name__ == '__main__':
