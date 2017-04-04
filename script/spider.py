@@ -8,6 +8,10 @@ from gpiozero import Motor, PWMLED
 # Eyelib can be managed by following variables:
 #    blinking : If True start a blink animation (1 cycle)
 #    blinkspd : Speed of blinking
+#    eyeangle :Ddirection of view
+#    eyedistance : Distance of pupil from center
+#    eyelid : Lid aperture (0=full open, 100=full close)
+#    autoblink : If True blinking is automatic
 #    eye : Eye image
 #    lid : Lid base image
 import eyelib
