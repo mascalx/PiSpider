@@ -121,34 +121,19 @@ PIXEL16BIT = 0x05
 PIXEL18BIT = 0x06
 #####################################################
 
-DC = 6 # old was 22
-RST = 13 # old was 16
-TFT_CS = 5 # old was 24
+DC = 22
+CE = 0
+RST = 18
+TFT_CS = 5 # modify
 
 ON = 1
 OFF = 0
 
 
 def color565(r, g, b):
-	"""
-	Convert red, green, blue components to a 16-bit 565 RGB value. 
-	Components should be values 0 to 255.
-	
-	
-	:param r: Red byte.
-	:param g: Green byte.
-	:param b: Blue byte.
-	:returns: pixel - 16-bit 565 RGB value
-	"""
 	return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
 def image_to_data(image):
-	"""Generator function to convert a PIL image to 16-bit 565 RGB bytes.
-	
-	
-	:param image: PIL image
-	:returns: imgArray 
-	"""
 	pixels = image.convert('RGB').load()
 	width, height = image.size
 	for y in range(height):
@@ -160,28 +145,21 @@ def image_to_data(image):
 
 
 class TFT(object):
-	"""FW Driver for an ST7735S TFT controller."""
 
 	def __init__(self):
-		"""
-		Creates a TFT object and configures SPI bus and pins.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		self.dc = DC
+		self.ce = CE
 		self.rst = RST
 		self.cs = TFT_CS
 		self.width = TFT_WIDTH
 		self.height = TFT_HEIGHT
 		
-		spi.open(0,1)             		#will open bus 0, CE1. 
+		spi.open(0,self.ce)             		#will open bus 0, CEx. 
 		#spi.max_speed_hz = 8000000
 		spi.max_speed_hz = int(16000000)
 		
 		GPIO.setwarnings(True)
-		#GPIO.setmode(GPIO.BOARD)	
+		GPIO.setmode(GPIO.BCM)	
 		GPIO.setup(self.cs, GPIO.OUT)		#Set GPIO24 as output
 		GPIO.setup(self.dc, GPIO.OUT)		# Set DC as output.
 		GPIO.setup(self.rst, GPIO.OUT)	
@@ -189,47 +167,15 @@ class TFT(object):
 		self.buffer = Image.new('RGB', (self.width, self.height))	# Create an image buffer.
 	
 	def CE_OUTPUT(self):
-		"""
-		Set TFT CS pin as output
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		GPIO.setup(self.cs, GPIO.OUT)	#Set GPIO24 as output
 			
 	def CE_SELECT(self):
-		"""
-		Select TFT CS pin.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		GPIO.output(self.cs, 0)
 			
 	def CE_DESELECT(self):
-		"""
-		Deselect TFT CS pin.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		GPIO.output(self.cs, 1)
 
 	def send(self, data, dataOrCmd=True, length=4096):
-		"""
-		Writes a byte or array of bytes to the display. 
-		dataOrCmd parameter controls if byte should be interpreted as display data (True)/ command data otherwise.  
-		Length is an optional size of bytes to write in a single SPI transaction, with a default of 4096. 
-		
-		
-		:param data: Single byte or an array of bytes.
-		:param dataOrCmd: Flag for command or data mode
-		:param length: size of array
-		:returns: none
-		"""
 		# Set DC low for command, high for data.
 		GPIO.output(self.dc, dataOrCmd)
 		# Convert scalar argument to list so either can be passed as parameter.
@@ -241,37 +187,16 @@ class TFT(object):
 			spi.writebytes(data[start:end])
 
 	def command(self, data):
-		"""
-		Write a byte or array of bytes to the display as command data.
-		
-		
-		:param data: Single byte command.
-		:returns: none
-		"""
 		self.CE_SELECT()	
 		self.send(data, False)
 		self.CE_DESELECT()	
 
 	def data(self, data):
-		"""
-		Write a byte or array of bytes to the display as display data.
-		
-		
-		:param data: Data byte
-		:returns: none
-		"""
 		self.CE_SELECT()	
 		self.send(data, True)
 		self.CE_DESELECT()	
 
 	def reset(self):
-		"""
-		Resets the display, (RST) reset pin must be connected.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		if self._rst is not None:
 			GPIO.output(self.rst,1)
 			time.sleep(0.005)
@@ -281,14 +206,6 @@ class TFT(object):
 			time.sleep(0.150)
 
 	def initialize(self):
-		"""
-		Intializes the display controller and prepares the it for any subsequent operations. 
-		
-		
-		:param none: 
-		:returns: none
-		"""
-	
 		GPIO.setup(self.dc, GPIO.OUT)
 		GPIO.setup(self.rst, GPIO.OUT)
 		GPIO.setup(TFT_CS, GPIO.OUT)
@@ -425,14 +342,6 @@ class TFT(object):
 		self.command(RAMWR)		# write to RAM
 
 	def display(self, image=None):
-		"""
-		Write the provided image to the hardware. If no image parameter is provided the display buffer will be written to the hardware.  
-		If an image is provided, it should be RGB format and the same dimensions as the display hardware.
-		
-		
-		:param image: picture image
-		:returns: none
-		"""
 		# By default write the internal buffer to the display.
 		if image is None:
 			image = self.buffer
@@ -447,46 +356,19 @@ class TFT(object):
 		self.data(pixelbytes)
 
 	def clear(self, color=(0,0,0)):
-		"""
-		Clear the image buffer to the specified RGB color (default black).
-		
-		
-		:param color: Background color. 
-		:returns: none
-		"""
 		width, height = self.buffer.size
 		self.buffer.putdata([color]*(width*height))
 
 	def draw(self):
-		"""
-		Return a PIL ImageDraw instance for 2D drawing on the image buffer.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		return ImageDraw.Draw(self.buffer)
 
 	def invert(self,status):
-		"""Disables color inversion on the display.
-		
-		
-		:param status:  Color inversion status.
-		:returns: none
-		"""
 		if (status == False):
 			self.command(INVOFF)
 		else:
 			self.command(INVON)
 	
 	def setRotation(self,mode):	
-		"""Sets the display text orientation. Mirrored modes are 
-			also supported on top of portrait and landscape modes.
-			
-			
-		:param mode: orientation data   
-		:returns: none
-		"""
 		self.command(MADCTL)
 		if (mode == 0x00):
 			 self.data(MADCTL_MY | MADCTL_MX| MADCTL_BGR)	#portrait
@@ -506,13 +388,6 @@ class TFT(object):
 			 self.data(MADCTL_M8 | MADCTL_BGR)				#Landscape mode reflected and inverted
 
 	def setGamma(self,gamma):
-		"""
-		Sets the  gamma mode of the display.
-		
-		
-		:param gamma:  Is from 1 to 4.
-		:returns: none
-		"""
 		self.command(NORON)
 		if(gamma == 1):
 			self.data(GAMMA1)
@@ -522,17 +397,8 @@ class TFT(object):
 			self.data(GAMMA3)
 		else:
 			self.data(GAMMA4)
-			 
 
 	def setPartialArea(self,start,end):
-		"""
-		Sets the  partial scroll area. This function is used in conjuction with the scrollArea function.
-		
-		
-		:param start:  start of patial area
-		:param end:  end of patial area
-		:returns: none
-		"""
 		self.command(PTLON)
 		self.data(start)				# start row
 		self.data(start >> 8)
@@ -540,18 +406,7 @@ class TFT(object):
 		self.data(end >> 8)
 		self.command(PTLON)
 	
-	
 	def scrollArea(self,tfa,vsa,bfa,firstline):
-		"""
-		Sets the  scroll area.
-		
-		
-		:param tfa:  top fixed area row
-		:param vsa:  vertical scrolling area
-		:param bfa:  bottom fixed area row
-		:param firstline: Beginning of  first line
-		:returns: none
-		"""
 		self.command(SCRLAR)
 		self.data(tfa)				# start row
 		self.data(tfa >> 8)
@@ -563,79 +418,29 @@ class TFT(object):
 		self.data(0x00)
 		self.data(firstline)				# which line in the Frame Memory will be written as the first line after the last line of the Top Fixed Area
 		
-		
 	def fullDisplay(self):
-		"""
-		Sets the  display in full screen mode.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		self.command(NORON)
 
 	def setColorMode(slef,mode):
-		"""
-		Sets the  pixel color depth. This can be 12,16 or 18 bit.
-		
-		
-		:param mode: Constant number
-		:returns: none
-		"""
 		self.command(COLMOD)
 		self.data(mode)
 		
 	def	sleep(self):
-		"""
-		Return a PIL ImageDraw instance for 2D drawing on the image buffer.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		self.command(SLEEP_IN)
 		time.sleep(0.005)
 
 	def wakeUp(self):
-		"""
-		Wakes the display from sleep mode.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		self.command(SLEEP_OUT)
 		time.sleep(0.120)
 
 	def idleMode(self,onoff):
-		"""
-		Puts the display or takes it out of idle mode 
-		
-		
-		:param onoff: idle mode status
-		:returns: none
-		"""
 		if(onoff == 0):
 			self.command(SIDLE_MODE_OFF)
 		else:
 			self.command(SIDLE_MODE_ON)
 		
 	def turnOff(self):
-		"""
-		Blanks out the display.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		self.command(DISPOFF)
 
 	def turnOn(self):
-		"""
-		This function turn on the display from idle mode.
-		
-		
-		:param none: 
-		:returns: none
-		"""
 		self.command(DISPON)
