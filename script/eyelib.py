@@ -10,6 +10,10 @@ blinkpos=0 # Frame position for eye blinking
 blinkdir=1 # Direction of animation (1 -> closing, -1 -> opening)
 blinking=False # Blinking time
 blinkspd=10 # Speed of blinking
+eyeangle=0 # Point of view angle
+eyedistance=0 # Distance from center
+eyelid=50 # Lid aperture (0..100)
+autoblink=True # Set to True if blinking should be automatic
 eye = Image.open("img/eye6.png") # Eye to be frawn
 lid = Image.open("img/lid.png") # Lid base image
 # Setup the display    
@@ -54,13 +58,17 @@ def CreateEye(drw,i=0,d=0,lt=50):
 def Eye():    
     global disp
     global blinking
+    global eyeangle
+    global eyedistance
+    global eyelid
+    global autoblink
     i=randint(50,200)
     while True:
-        CreateEye(disp.buffer,0,0,50)
+        CreateEye(disp,eyeangle,eyedistance,eyelid)
         disp.display()
-        #disp.save("result%i.png"%i)
-        i=i-1
-        if (i==0):
-            blinking=True
-            i=randint(50,200)
+        if (autoblink):
+            i=i-1
+            if (i==0):
+                blinking=True
+                i=randint(50,200)
         sleep(0.05)
