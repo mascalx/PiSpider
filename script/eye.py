@@ -68,6 +68,6 @@ def Eye():
             i=randint(50,200)
         sleep(0.05)    
         
-# Main program
+# Main program !!!! REMOVE WHE USED IN SPIDER !!!!
 if __name__ == '__main__':
     Eye()
