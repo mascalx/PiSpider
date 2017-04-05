@@ -34,7 +34,6 @@ def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
             yS = Cy+r*np.cos(theta)
             map_x.itemset((y,x),int(xS))
             map_y.itemset((y,x),int(yS))
-        
     return map_x, map_y
 
 # Do the unwarping 
@@ -63,7 +62,7 @@ panorama = unwarping(img,xmap,ymap)
 def UnWarp():
     global xmap
     global ymap
-    global result
+    global panorama
     while True:
         img = GetFrame()
         panorama = unwarping(img,xmap,ymap)
