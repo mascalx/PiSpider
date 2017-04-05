@@ -107,7 +107,7 @@ PIXEL18BIT = 0x06
 DC = 22
 CE = 0
 RST = 18
-TFT_CS = 5 # modify
+TFT_CS = 8
 
 ON = 1
 OFF = 0
@@ -134,7 +134,7 @@ class TFT(object):
         self.width = TFT_WIDTH
         self.height = TFT_HEIGHT
         spi.open(0,self.ce)
-        spi.max_speed_hz = int(16000000)
+        spi.max_speed_hz = int(24000000)
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)	
         GPIO.setup(self.cs, GPIO.OUT)
@@ -165,10 +165,10 @@ class TFT(object):
         self.send(data, False)
         self.CE_DESELECT()	
 
-	def data(self, data):
-		self.CE_SELECT()	
-		self.send(data, True)
-		self.CE_DESELECT()	
+    def data(self, data):
+        self.CE_SELECT()	
+        self.send(data, True)
+        self.CE_DESELECT()	
 
     def reset(self):
         if self._rst is not None:
