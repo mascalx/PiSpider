@@ -22,6 +22,8 @@ disp.initialize()		# Initialize display.
 WHITE=(255,255,255)
 BLACK=(0,0,0)
 
+mpi=math.pi/180
+
 # Create the eye image (i=eye angle [0-360], d=distance from center, lt=lid aperture [0=open - 100=closed, <0 no lid])
 def CreateEye(drw,i=0,d=0,lt=50):
     global blinking
@@ -30,11 +32,12 @@ def CreateEye(drw,i=0,d=0,lt=50):
     global blinkspd
     global eye
     global lid
+    global mpi
     we, he = eye.size
-    x=math.cos(i*math.pi/180.0)
-    y=math.sin(i*math.pi/180.0)
+    x=int(math.cos(i*mpi)*d)
+    y=int(math.sin(i*mpi)*d)
     clear(disp,WHITE)
-    drw.paste(eye,(int((128-we)/2)+int(x*d),int((128-he)/2)-int(y*d))) # Drawing the eye in desired position
+    drw.paste(eye,(((128-we)>>1)+x,((128-he)>>1)-y)) # Drawing the eye in desired position
     if (lt>=0): # Lid present only if aperture is not negative
         # Blinking routine
         if (blinking):
@@ -49,8 +52,8 @@ def CreateEye(drw,i=0,d=0,lt=50):
                     blinkdir=1
                     blinking=False
                     blinkpos=0
-        ld=lid.copy() # Get lid base image
-        ld = lid.point(lambda p: p > int((lt+blinkpos)*2.55) and 255) # Convert to mask
+        ltb=int((lt+blinkpos)*2.55)
+        ld = lid.point(lambda p: p > ltb and 255) # Convert to mask
         drw.paste(ld, (0,0), ImageOps.invert(ld)) # Paste mask on the eye
     return
     
@@ -62,7 +65,7 @@ def Eye():
     global eyedistance
     global eyelid
     global autoblink
-    i=randint(50,200)
+    i=randint(2,20)
     while True:
         CreateEye(disp,eyeangle,eyedistance,eyelid)
         disp.display()
@@ -70,5 +73,4 @@ def Eye():
             i=i-1
             if (i==0):
                 blinking=True
-                i=randint(50,200)
-        sleep(0.05)
+                i=randint(2,20)
