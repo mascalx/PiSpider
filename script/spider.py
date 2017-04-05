@@ -51,22 +51,25 @@ def Rotate(angle,spd):
     else:
         head.backward(abs(spd))
     if (spd<>0):    
-        time.sleep(ANG_SPD(angle/abs(spd)))
+        time.sleep(ANG_SPD*(angle/abs(spd)))
     head.stop()    
     Facing=(Facing-(angle*(np.sign(spd))))%360
     
-# Returns the angles of the brightest spot in the panoramic frame (x = horizontal, y = vertical)
-def FindBrightestSpot():
-    gray = cv2.cvtColor(dewarp.panorama, cv2.COLOR_BGR2GRAY)
+# Returns the angles of the brightest spot in the (CV2) image (a = angle [-180..180], d = radius, maxVal = intensity)
+def FindBrightestSpot(img,cx,cy):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (11, 11), 0)
     minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
-    X = ((dewarp.Wd-maxLoc[0])*360)/dewarp.Wd # Offset to be added to fix start position of the panorama
-    Y = ((dewarp.Hd-maxLoc[0])*30)/dewarp.Hd # Should be fixed after computing the right vertical FOV of the panorama
-    return X,Y
+    x,y,v=FindBrightestSpot(img) # Get brightest spot data
+    x=maxLoc[0]
+    y=maxLoc[1]
+    d=np.sqrt(np.sqr(cx-x)+np.sqr(cy-y)) # Distance from center
+    a=np.arctan2((y-cy),(x-cx))/eyelib.mpi # Angle (-180..180)
+    return a,d,maxVal
 
-# Returns the averahe luminosity of the panorama
-def AverageBrightness():
-    gray = cv2.cvtColor(dewarp.panorama, cv2.COLOR_BGR2GRAY)
+# Returns the average luminosity of the (CV2) image
+def AverageBrightness(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return np.mean(gray)
 
 # Main program
@@ -75,8 +78,10 @@ if __name__ == '__main__':
     motor.stop() # Be sure the robot is not moving
     head.stop() # Be sure the robot is not moving
     
-    thread.start_new_thread(Eye, ()) # Eye thread
-    thread.start_new_thread(UnWarp, ()) # Unwarping thread
+    thread.start_new_thread(eyelib.Eye, ()) # Eye thread
+    #thread.start_new_thread(dewarp.UnWarp, ()) # Unwarping thread
     
     while True: # Loop forever
-        pass
+        dewarp.img=dewarp.GetFrame() # Get new frame
+        bright=AverageBrightness(dewarp.img) # Get ambient light
+        a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
