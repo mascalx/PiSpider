@@ -2,8 +2,8 @@ import math
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageOps
-from random import randint
-from time import sleep
+from random import uniform
+from time import sleep, time
 import TFT as GLCD
 
 blinkpos=0 # Frame position for eye blinking
@@ -65,12 +65,13 @@ def Eye():
     global eyedistance
     global eyelid
     global autoblink
-    i=randint(2,20)
+    i=uniform(0.8,2.5)
+    st=time()
     while True:
         CreateEye(disp,eyeangle,eyedistance,eyelid)
         disp.display()
         if (autoblink):
-            i=i-1
-            if (i==0):
+            if (i<=(time()-st)):
                 blinking=True
-                i=randint(2,20)
+                i=uniform(0.8,2.5)
+                st=time()
