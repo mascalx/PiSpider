@@ -7,17 +7,20 @@ from gpiozero import Motor, PWMLED
 
 # Eyelib can be managed by following variables:
 #    blinking : If True start a blink animation (1 cycle)
-#    blinkspd : Speed of blinking
-#    eyeangle :Ddirection of view
+#    eyeangle : Direction of view
 #    eyedistance : Distance of pupil from center
-#    eyelid : Lid aperture (0=full open, 100=full close)
+#    eyelid : Lid aperture (0=full close..5=full open, <0=no lid)
 #    autoblink : If True blinking is automatic
-#    eye : Eye image
-#    lid : Lid base image
+#    background : background color
+#    ChangeEye(n) : Change the drawn eye (n=0..14)
+#    ChangePlate(n) : Change the drawn plate (n=0..6)
 import eyelib
 
 # Last dewarped frame can be accessed by using variable "panorama"
 # A copy should be used to access data in order to avoid in-between garbage
+#    panorama : the unwarped image
+#    img : the last captured frame
+#    GetFrame() : Function to get a new frame
 import dewarp
 
 # Constants
