@@ -29,7 +29,7 @@ M_BWD = 0 # GPIO pin for backward movement
 M_CKW = 0 # GPIO pin for clockwise rotation
 M_CCW = 0 # GPIO pin for counterclockwise rotation
 BLIGHT = 0 # GPIO pin for TFT backlight control
-ANG_SPD = 0 # Angular speed for head rotation
+ANG_SPD = 100 # Angular speed for head rotation
 Facing = 0 # Current direction (approximate)
 
 # Actuators creation
@@ -66,6 +66,7 @@ def FindBrightestSpot(img,cx,cy):
     x,y,v=FindBrightestSpot(img) # Get brightest spot data
     x=maxLoc[0]
     y=maxLoc[1]
+    print x,y
     d=np.sqrt(np.sqr(cx-x)+np.sqr(cy-y)) # Distance from center
     a=np.arctan2((y-cy),(x-cx))/eyelib.mpi # Angle (-180..180)
     return a,d,maxVal
@@ -84,7 +85,20 @@ if __name__ == '__main__':
     thread.start_new_thread(eyelib.Eye, ()) # Eye thread
     #thread.start_new_thread(dewarp.UnWarp, ()) # Unwarping thread
     
-    while True: # Loop forever
-        dewarp.img=dewarp.GetFrame() # Get new frame
-        bright=AverageBrightness(dewarp.img) # Get ambient light
-        a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+    #while True: # Loop forever
+    #    dewarp.img=dewarp.GetFrame() # Get new frame
+    #    #bright=AverageBrightness(dewarp.img) # Get ambient light
+    #    a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+    
+# !!!! DELETE AFTER GETTING DATA
+# Lines below are just for gathering some data in order to calculate the ANG_SPD value
+dewarp.img=dewarp.GetFrame() # Get new frame
+a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+print a,d,v
+cv2.imwrite("im1.jpg",dewarp.img)
+Rotate (10,1)
+a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+dewarp.img=dewarp.GetFrame() # Get new frame
+a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+print a,d,v
+cv2.imwrite("im1.jpg",dewarp.img)
