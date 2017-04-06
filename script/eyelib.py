@@ -1,7 +1,6 @@
 import math
 from PIL import Image
 from PIL import ImageDraw
-from PIL import ImageOps
 from random import uniform
 from time import sleep, time
 import TFT as GLCD
