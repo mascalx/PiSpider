@@ -6,56 +6,64 @@ from random import uniform
 from time import sleep, time
 import TFT as GLCD
 
-blinkpos=0 # Frame position for eye blinking
-blinkdir=1 # Direction of animation (1 -> closing, -1 -> opening)
-blinking=False # Blinking time
-blinkspd=10 # Speed of blinking
-eyeangle=0 # Point of view angle
-eyedistance=0 # Distance from center
-eyelid=50 # Lid aperture (0..100)
-autoblink=True # Set to True if blinking should be automatic
-eye = Image.open("img/eye6.png") # Eye to be frawn
-lid = Image.open("img/lid.png") # Lid base image
-# Setup the display    
-disp = GLCD.TFT()		# Create TFT LCD display class.
-disp.initialize()		# Initialize display.
+LIDP="img/lid/"
+EYEP="img/eyes/"
+PLATEP="img/plates/"
 WHITE=(255,255,255)
 BLACK=(0,0,0)
 
+blinking=False # Blinking time
+eyeangle=0 # Point of view angle
+eyedistance=0 # Distance from center
+eyelid=3 # Lid aperture (0..5)
+autoblink=True # Set to True if blinking should be automatic
+eyes = ["eye01", "eye02", "eye03", "eye04", "eye05", "eye06", "eye07", "eye08", "eye09", "eye10", "eye11", "eye12", "eye13", "eye14", "eye15"]
+plates = ["plate1", "plate2", "plate3", "plate4", "plate5", "plate6", "plate7"]
+eye = Image.open(EYEP+eyes[0]+".png") # Default eye
+plate = Image.open(PLATEP+palets[0]+".png") # Default eye plate
+background = WHITE # Default background color
+lid = [Image.open(LIDP+"lid0.png"), Image.open(LIDP+"lid01.png"), Image.open(LIDP+"lid2.png"), Image.open(LIDP+"lid3.png"), Image.open(LIDP+"lid4.png"), Image.open(LIDP+"lid5.png")]
+# Setup the display    
+disp = GLCD.TFT()		# Create TFT LCD display class.
+disp.initialize()		# Initialize display.
+
 mpi=math.pi/180
 
-# Create the eye image (i=eye angle [0-360], d=distance from center, lt=lid aperture [0=open - 100=closed, <0 no lid])
-def CreateEye(drw,i=0,d=0,lt=50):
+# Create the eye image (i=eye angle [0-360], d=distance from center, lt=lid aperture [0=closed - 5=open, <0 no lid])
+def CreateEye(drw,i=0,d=0,lt=3):
     global blinking
-    global blinkdir
-    global blinkpos
-    global blinkspd
     global eye
+    global plate
     global lid
+    global background
     global mpi
-    we, he = eye.size
-    x=int(math.cos(i*mpi)*d)
-    y=int(math.sin(i*mpi)*d)
-    clear(disp,WHITE)
-    drw.paste(eye,(((128-we)>>1)+x,((128-he)>>1)-y)) # Drawing the eye in desired position
+    x=int(math.cos(i*mpi)*d) # Calculates X position for the eye
+    y=int(math.sin(i*mpi)*d) # Calculates Y position for the eye
+    clear(disp,background) # Clear area using selected background color
+    drw.paste(eye, (32+x,32-y), eye) # Drawing the eye in desired position
+    drw.paste(plate, (0,0), plate) # Drawing the plate (after the eye, so eye remains invisible if too far from center)
     if (lt>=0): # Lid present only if aperture is not negative
         # Blinking routine
         if (blinking):
-            if (blinkdir>0):
-                blinkpos=blinkpos+blinkspd
-                if (blinkpos>=(100-lt)):
-                    blinkdir=-1
-                    blinkpos=100-lt
-            else:
-                blinkpos=blinkpos-blinkspd
-                if (blinkpos<blinkspd):
-                    blinkdir=1
-                    blinking=False
-                    blinkpos=0
-        ltb=int((lt+blinkpos)*2.55)
-        ld = lid.point(lambda p: p > ltb and 255) # Convert to mask
-        drw.paste(ld, (0,0), ImageOps.invert(ld)) # Paste mask on the eye
+            drw.paste(lid[0], (0,0), lid[0]) # Paste lid on the eye
+            blinking=Flase
+        else:    
+            drw.paste(lid[lt], (0,0), lid[lt]) # Paste lid on the eye
     return
+
+# Change eye image
+def ChangeEye(n):
+    global eye
+    if (n>=0) and (n<15):
+        eye=Image.open(EYEP+eyes[n]+".png")
+    return    
+
+# Change eye plate
+def ChangePlate(n):
+    global palte
+    if (n>=0) and (n<7):
+        plate = Image.open(PLATEP+palets[n]+".png")
+    return    
     
 # Main eye function
 def Eye():    
