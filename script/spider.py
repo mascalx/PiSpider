@@ -1,9 +1,31 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
+#********************************************************************
+# PiSpider v0.1
+# Control system for modified Xpider Ballsy by Roboeve
+#
+# Sensors:
+#     Camera 360°
+#         - Brightest spot direction (-180..+180)
+#         - Brightest spot elevation (0..90)
+#         - Ambient light (0..100)
+#         - Face detection (dir and elev of first detected face)
+#     Left digital bumper (0..1)
+#     Right digital bumper (0..1)
+#
+# Actuators:
+#     Legs motor (-100..+100)
+#     Head rotation motor (-100..+100)
+#
+# Other:
+#     TFT display for eye simulation
+#     Backlight for TFT (0..100)
+#********************************************************************
+
 import thread, time, cv2
 import numpy as np
-from gpiozero import Motor, PWMLED
+from gpiozero import Motor, PWMLED, Button
 
 # Eyelib can be managed by following variables:
 #    blinking : If True start a blink animation (1 cycle)
@@ -24,11 +46,13 @@ import eyelib
 import dewarp
 
 # Constants
-M_FWD = 0 # GPIO pin for forward movement
-M_BWD = 0 # GPIO pin for backward movement
-M_CKW = 0 # GPIO pin for clockwise rotation
-M_CCW = 0 # GPIO pin for counterclockwise rotation
-BLIGHT = 0 # GPIO pin for TFT backlight control
+M_FWD = 5 # GPIO5 pin for forward movement
+M_BWD = 6 # GPIO6 pin for backward movement
+M_CKW = 20 # GPIO20 pin for clockwise rotation
+M_CCW = 21 # GPIO21 pin for counterclockwise rotation
+BLIGHT = 12 # GPIO12 pin for TFT backlight control
+LBUMP = 19 # GPIO19 pin for left bumper sensor
+RBUMP = 26 # GPIO26 pin for right bumper sensor
 ANG_SPD = 100 # Angular speed for head rotation
 Facing = 0 # Current direction (approximate)
 
@@ -36,6 +60,8 @@ Facing = 0 # Current direction (approximate)
 motor = Motor(M_FWD, M_BWD, pwm=True)
 head = Motor(M_CKW, M_CCW, pwm=True)
 backlight = PWMLED(BLIGHT)
+l_bump = Button(LBUMP)
+r_bump = Button (RBUMP)
 
 # Move the spider forward or backward. Speed -1..0 = backward, 0..1 = forward
 def Move(spd):
@@ -66,15 +92,15 @@ def FindBrightestSpot(img,cx,cy):
     x,y,v=FindBrightestSpot(img) # Get brightest spot data
     x=maxLoc[0]
     y=maxLoc[1]
-    print x,y
+    print x,y # !!!! REMOVE
     d=np.sqrt(np.sqr(cx-x)+np.sqr(cy-y)) # Distance from center
     a=np.arctan2((y-cy),(x-cx))/eyelib.mpi # Angle (-180..180)
     return a,d,maxVal
 
-# Returns the average luminosity of the (CV2) image
+# Returns the average luminosity of the (CV2) image (0..100)
 def AverageBrightness(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    return np.mean(gray)
+    return int(np.mean(gray)/2.55)
 
 # Main program
 if __name__ == '__main__':
@@ -89,6 +115,8 @@ if __name__ == '__main__':
     #    dewarp.img=dewarp.GetFrame() # Get new frame
     #    #bright=AverageBrightness(dewarp.img) # Get ambient light
     #    a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+    #    if (r_bump.is_pressed):
+    #        print "bump!"
     
 # !!!! DELETE AFTER GETTING DATA
 # Lines below are just for gathering some data in order to calculate the ANG_SPD value
