@@ -1,6 +1,5 @@
-import cv2
+import cv2, thread, time
 import numpy as np
-import time
 import picamera
 import picamera.array
 from PIL import Image
@@ -15,6 +14,8 @@ Cy = 240
 R1 = 50
 # Outer donut radius
 R2 = 100
+
+uscita=False
 
 # Initialize PiCamera
 camera=picamera.PiCamera()
@@ -63,6 +64,12 @@ def UnWarp():
     global xmap
     global ymap
     global panorama
+    global uscita
     while True:
         img = GetFrame()
         panorama = unwarping(img,xmap,ymap)
+        if (uscita):
+            thread.exit()
+
+def ExitUnwarp():
+    uscita=True
