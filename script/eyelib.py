@@ -5,9 +5,9 @@ from random import uniform
 from time import sleep, time
 import TFT as GLCD
 
-LIDP="img/lid/"
-EYEP="img/eyes/"
-PLATEP="img/plates/"
+LIDP="lid/"
+EYEP="eyes/"
+PLATEP="plates/"
 WHITE=(255,255,255)
 BLACK=(0,0,0)
 
@@ -19,9 +19,9 @@ autoblink=True # Set to True if blinking should be automatic
 eyes = ["eye01", "eye02", "eye03", "eye04", "eye05", "eye06", "eye07", "eye08", "eye09", "eye10", "eye11", "eye12", "eye13", "eye14", "eye15"]
 plates = ["plate1", "plate2", "plate3", "plate4", "plate5", "plate6", "plate7"]
 eye = Image.open(EYEP+eyes[0]+".png") # Default eye
-plate = Image.open(PLATEP+palets[0]+".png") # Default eye plate
+plate = Image.open(PLATEP+plates[0]+".png") # Default eye plate
 background = WHITE # Default background color
-lid = [Image.open(LIDP+"lid0.png"), Image.open(LIDP+"lid01.png"), Image.open(LIDP+"lid2.png"), Image.open(LIDP+"lid3.png"), Image.open(LIDP+"lid4.png"), Image.open(LIDP+"lid5.png")]
+lid = [Image.open(LIDP+"lid0.png"), Image.open(LIDP+"lid1.png"), Image.open(LIDP+"lid2.png"), Image.open(LIDP+"lid3.png"), Image.open(LIDP+"lid4.png"), Image.open(LIDP+"lid5.png")]
 # Setup the display    
 disp = GLCD.TFT()		# Create TFT LCD display class.
 disp.initialize()		# Initialize display.
@@ -38,16 +38,16 @@ def CreateEye(drw,i=0,d=0,lt=3):
     global mpi
     x=int(math.cos(i*mpi)*d) # Calculates X position for the eye
     y=int(math.sin(i*mpi)*d) # Calculates Y position for the eye
-    clear(disp,background) # Clear area using selected background color
-    drw.paste(eye, (32+x,32-y), eye) # Drawing the eye in desired position
-    drw.paste(plate, (0,0), plate) # Drawing the plate (after the eye, so eye remains invisible if too far from center)
+    disp.clear(background) # Clear area using selected background color
+    drw.buffer.paste(eye, (32+x,32-y), eye) # Drawing the eye in desired position
+    drw.buffer.paste(plate, (0,0), plate) # Drawing the plate (after the eye, so eye remains invisible if too far from center)
     if (lt>=0): # Lid present only if aperture is not negative
         # Blinking routine
         if (blinking):
-            drw.paste(lid[0], (0,0), lid[0]) # Paste lid on the eye
-            blinking=Flase
+            drw.buffer.paste(lid[0], (0,0), lid[0]) # Paste lid on the eye
+            blinking=False
         else:    
-            drw.paste(lid[lt], (0,0), lid[lt]) # Paste lid on the eye
+            drw.buffer.paste(lid[lt], (0,0), lid[lt]) # Paste lid on the eye
     return
 
 # Change eye image
@@ -59,9 +59,9 @@ def ChangeEye(n):
 
 # Change eye plate
 def ChangePlate(n):
-    global palte
+    global plate
     if (n>=0) and (n<7):
-        plate = Image.open(PLATEP+palets[n]+".png")
+        plate = Image.open(PLATEP+plates[n]+".png")
     return    
     
 # Main eye function
