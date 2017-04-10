@@ -1,4 +1,4 @@
-import math
+import math, htread
 from PIL import Image
 from PIL import ImageDraw
 from random import uniform
@@ -22,6 +22,7 @@ eye = Image.open(EYEP+eyes[0]+".png") # Default eye
 plate = Image.open(PLATEP+plates[0]+".png") # Default eye plate
 background = WHITE # Default background color
 lid = [Image.open(LIDP+"lid0.png"), Image.open(LIDP+"lid1.png"), Image.open(LIDP+"lid2.png"), Image.open(LIDP+"lid3.png"), Image.open(LIDP+"lid4.png"), Image.open(LIDP+"lid5.png")]
+uscita=False # Set to true to exit the lib thread
 # Setup the display    
 disp = GLCD.TFT()		# Create TFT LCD display class.
 disp.initialize()		# Initialize display.
@@ -72,6 +73,7 @@ def Eye():
     global eyedistance
     global eyelid
     global autoblink
+    global uscita
     i=uniform(0.8,2.5)
     st=time()
     while True:
@@ -82,3 +84,8 @@ def Eye():
                 blinking=True
                 i=uniform(0.8,2.5)
                 st=time()
+        if (uscita):
+            thread.exit()
+                
+def ExitEye():
+    uscita=True
