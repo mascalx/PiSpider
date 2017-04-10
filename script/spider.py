@@ -135,3 +135,8 @@ if __name__ == '__main__':
 #a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
 #print a,d,v
 #cv2.imwrite("im2.jpg",dewarp.img)
+
+# Stops the threads
+ExitEye()
+ExitUnwarp()
+time.sleep(1000) # Waits 1 second
