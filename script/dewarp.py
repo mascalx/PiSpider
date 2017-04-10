@@ -18,9 +18,9 @@ R2 = 100
 
 # Initialize PiCamera
 camera=picamera.PiCamera()
-camera.resolution=(Ws, H2)
+camera.resolution=(Ws, Hs)
 camera.rotation=180
-camera.framerate=0
+#camera.framerate=0
 
 # Build the unwarp mapping
 def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
@@ -57,7 +57,7 @@ Hd = (R2-R1)
 xmap,ymap = buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy)
 # First unwarp
 img = GetFrame()
-panorama = unwarping(img,xmap,ymap)
+#panorama = unwarping(img,xmap,ymap)
 
 def UnWarp():
     global xmap
