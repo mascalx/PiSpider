@@ -113,7 +113,7 @@ ON = 1
 OFF = 0
 
 def color565(r, g, b):
-    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+    return ((b & 0xF8) << 8) | ((g & 0xFC) << 3) | (r >> 3)
 
 def image_to_data(image):
     pixels = image.convert('RGB').load()
