@@ -117,16 +117,21 @@ if __name__ == '__main__':
     #    a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
     #    if (r_bump.is_pressed):
     #        print "bump!"
+    o=0
+    while o<15:
+        eyelib.ChangeEye(o)
+        time.sleep(10)
+        o=o+1
     
 # !!!! DELETE AFTER GETTING DATA
 # Lines below are just for gathering some data in order to calculate the ANG_SPD value
-dewarp.img=dewarp.GetFrame() # Get new frame
-a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-print a,d,v
-cv2.imwrite("im1.jpg",dewarp.img)
-Rotate (10,1)
-a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-dewarp.img=dewarp.GetFrame() # Get new frame
-a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-print a,d,v
-cv2.imwrite("im1.jpg",dewarp.img)
+#dewarp.img=dewarp.GetFrame() # Get new frame
+#a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+#print a,d,v
+#cv2.imwrite("im1.jpg",dewarp.img)
+#Rotate (10,1)
+#a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+#dewarp.img=dewarp.GetFrame() # Get new frame
+#a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+#print a,d,v
+#cv2.imwrite("im2.jpg",dewarp.img)
