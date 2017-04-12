@@ -1,4 +1,4 @@
-import cv2, thread, time
+import cv2, thread, time, urllib
 import numpy as np
 import picamera
 import picamera.array
@@ -43,13 +43,18 @@ def unwarping(img,xmap,ymap):
     result = Image(output,cv2image=True)
     return result
     
-# Get next video frame (cv2 format)   
+# Get next video frame (cv2 format)
+# Uses mjpg-streamer to create the video stream
 def GetFrame():
-    global camera
-    with picamera.array.PiRGBArray(camera) as stream:
-        stream.truncate(0)
-        camera.capture(stream, format='bgr')
-    return stream.array
+    #global camera
+    #with picamera.array.PiRGBArray(camera) as stream:
+    #    stream.truncate(0)
+    #    camera.capture(stream, format='bgr')
+    #return stream.array
+    req = urllib.urlopen('http://127.0.0.1:8080/?action=snapshot')
+    arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+    image = cv2.imdecode(arr,-1)
+    return image
 
 # Output image size
 Wd = 2.0*((R2+R1)/2)*np.pi
