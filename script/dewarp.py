@@ -1,27 +1,19 @@
 import cv2, thread, time, urllib
 import numpy as np
-import picamera
-import picamera.array
 from PIL import Image
 
 # Frame size
-Ws = 640
-Hs = 480
+Ws = 320
+Hs = 240
 # Center of the donut
-Cx = 320
-Cy = 240
+Cx = 157
+Cy = 125
 # Inner donut radius
-R1 = 50
+R1 = 65
 # Outer donut radius
-R2 = 100
+R2 = 74
 
 uscita=False
-
-# Initialize PiCamera
-camera=picamera.PiCamera()
-camera.resolution=(Ws, Hs)
-camera.rotation=180
-#camera.framerate=0
 
 # Build the unwarp mapping
 def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
@@ -46,12 +38,8 @@ def unwarping(img,xmap,ymap):
 # Get next video frame (cv2 format)
 # Uses mjpg-streamer to create the video stream
 def GetFrame():
-    #global camera
-    #with picamera.array.PiRGBArray(camera) as stream:
-    #    stream.truncate(0)
-    #    camera.capture(stream, format='bgr')
-    #return stream.array
-    req = urllib.urlopen('http://127.0.0.1:8080/?action=snapshot')
+    #req = urllib.urlopen('http://127.0.0.1:8080/?action=snapshot')
+    req=image.open("frame.jpg")
     arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
     image = cv2.imdecode(arr,-1)
     return image
