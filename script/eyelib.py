@@ -1,4 +1,4 @@
-import math, htread
+import math, thread
 from PIL import Image
 from PIL import ImageDraw
 from random import uniform
