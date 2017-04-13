@@ -137,6 +137,6 @@ if __name__ == '__main__':
 #cv2.imwrite("im2.jpg",dewarp.img)
 
 # Stops the threads
-ExitEye()
-ExitUnwarp()
+eyelib.ExitEye()
+dewarp.ExitUnwarp()
 time.sleep(1000) # Waits 1 second
