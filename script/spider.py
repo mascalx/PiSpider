@@ -104,24 +104,26 @@ def AverageBrightness(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return int(np.mean(gray)/2.55)
 
-# Returns list of frontal faces (rectangles)
+# Returns list of frontal faces (angle,elevation)
 def GetFaces(img):    
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, flags=cv2.CASCADE_SCALE_IMAGE)
-    for (x,y,w,h) in faces:
-        fx=x+(w>>1)
-        fy=y+(h>>1)
-        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    lista = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, flags=cv2.CASCADE_SCALE_IMAGE)
+    faces=[]
+    for (x,y,w,h) in lista:
+        fx=(x+(w/2.0)-298)*180.0/298.0
+        fy=y+(h/2)
+        faces.append([fx,fy])
     return faces
     
-# Returns list of frontal cats faces (rectangles)
+# Returns list of frontal cats faces (angle,elevation)
 def GetCats(img):    
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    cats = cat_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, flags=cv2.CASCADE_SCALE_IMAGE)
-    for (x,y,w,h) in cats:
-        fx=x+(w>>1)
-        fy=y+(h>>1)
-        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    lista = cat_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, flags=cv2.CASCADE_SCALE_IMAGE)
+    cats=[]
+    for (x,y,w,h) in lista:
+        fx=(x+(w/2.0)-298)*180.0/298.0
+        fy=y+(h/2)
+        cats.append([fx,fy])
     return cats
 
 # Main program
@@ -133,40 +135,54 @@ if __name__ == '__main__':
     thread.start_new_thread(eyelib.Eye, ()) # Eye thread
     thread.start_new_thread(dewarp.UnWarp, ()) # Unwarping thread
     
-    #while True: # Loop forever
-    #    dewarp.img=dewarp.GetFrame() # Get new frame
-    #    #bright=AverageBrightness(dewarp.img) # Get ambient light
-    #    a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-    #    if (r_bump.is_pressed):
-    #        print "bump!"
-    o=0
-    eyelib.ChangeEye(0)
-    t=time()
-    while o<15:
+    while True: # Loop forever
+        if (r_bump.is_pressed):
+            print "bump!"
         a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
         pano=dewarp.panorama.copy() # Get copy of the unwarped image
         faces=GetFaces(pano) # Detect human faces (frontal)
         cats=GetCats(pano) # Detect feline faces (frontal)
         if (faces): # face(s) detected
-            pass
-        elif (cats): # humans, but cats have been detected
-            pass
-        else: # no beings to interact with
-            if (a<-10):
+            for (x,y) in faces:
+                if (x<5):
+                    eyelib.eyeangle=0
+                    eyelib.eyedistance=int(-x/2)
+                    if (eyelib.eyedistance>30):
+                        eyelib.eyedistance=30
+                elif (x>5):
+                    eyelib.eyeangle=180
+                    eyelib.eyedistance=int(x/2)
+                    if (eyelib.eyedistance>30):
+                        eyelib.eyedistance=30
+                else:
+                    eyelib.eyedistance=0
+        elif (cats): # no humans, but cats have been detected
+            for (x,y) in cats:
+                if (x<-5):
+                    eyelib.eyeangle=0
+                    eyelib.eyedistance=int(-x/2)
+                    if (eyelib.eyedistance>30):
+                        eyelib.eyedistance=30
+                elif (x>5):
+                    eyelib.eyeangle=180
+                    eyelib.eyedistance=int(x/2)
+                    if (eyelib.eyedistance>30):
+                        eyelib.eyedistance=30
+                else:
+                    eyelib.eyedistance=0
+        else: # no beings to interact with so search for light
+            if (a<-5):
                 eyelib.eyeangle=0
-                eyelib.eyedistance=20
-            elif (a>10):
+                eyelib.eyedistance=int(-a/2)
+                if (eyelib.eyedistance>30):
+                    eyelib.eyedistance=30
+            elif (a>5):
                 eyelib.eyeangle=180
-                eyelib.eyedistance=20
+                eyelib.eyedistance=int(a/2)
+                if (eyelib.eyedistance>30):
+                    eyelib.eyedistance=30
             else:
                 eyelib.eyedistance=0
-        if ((time()-st)>8):
-            o=o+1
-            if (o<15):
-                eyelib.ChangeEye(o)
-            else:
-                eyelib.eyelid=5        
-            st=time()
     
 # !!!! DELETE AFTER GETTING DATA
 # Lines below are just for gathering some data in order to calculate the ANG_SPD value
@@ -180,8 +196,3 @@ if __name__ == '__main__':
 #a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
 #print a,d,v
 #cv2.imwrite("im2.jpg",dewarp.img)
-
-# Stops the threads
-eyelib.ExitEye()
-dewarp.ExitUnwarp()
-time.sleep(1000) # Waits 1 second
