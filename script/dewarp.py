@@ -9,9 +9,9 @@ Hs = 240
 Cx = 157
 Cy = 125
 # Inner donut radius
-R1 = 65
+R1 = 60
 # Outer donut radius
-R2 = 74
+R2 = 130
 
 uscita=False
 
@@ -19,10 +19,12 @@ uscita=False
 def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
     map_x = np.zeros((Hd,Wd),np.float32)
     map_y = np.zeros((Hd,Wd),np.float32)
+    p2=2.0*np.pi
+    pm=np.pi/2.0
     for y in range(0,int(Hd-1)):
         for x in range(0,int(Wd-1)):
             r = (float(y)/float(Hd))*(R2-R1)+R1
-            theta = (float(x)/float(Wd))*2.0*np.pi
+            theta = (float(x)/float(Wd))*p2-pm
             xS = Cx+r*np.sin(theta)
             yS = Cy+r*np.cos(theta)
             map_x.itemset((y,x),int(xS))
@@ -31,15 +33,13 @@ def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
 
 # Do the unwarping 
 def unwarping(img,xmap,ymap):
-    output = cv2.remap(img.getNumpyCv2(),xmap,ymap,cv2.INTER_LINEAR)
-    result = Image(output,cv2image=True)
+    output = cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)
     return result
     
 # Get next video frame (cv2 format)
 # Uses mjpg-streamer to create the video stream
 def GetFrame():
-    #req = urllib.urlopen('http://127.0.0.1:8080/?action=snapshot')
-    req=image.open("frame.jpg")
+    req = urllib.urlopen('http://127.0.0.1:8080/?action=snapshot')
     arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
     image = cv2.imdecode(arr,-1)
     return image
@@ -50,7 +50,7 @@ Hd = (R2-R1)
 # Build unwarping map
 xmap,ymap = buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy)
 # First unwarp
-img = GetFrame()
+#img = GetFrame()
 #panorama = unwarping(img,xmap,ymap)
 
 def UnWarp():
