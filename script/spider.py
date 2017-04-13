@@ -63,6 +63,10 @@ backlight = PWMLED(BLIGHT)
 l_bump = Button(LBUMP)
 r_bump = Button (RBUMP)
 
+# Face and cat detectors
+face_cascade = cv2.CascadeClassifier('face.xml')
+cat_cascade = cv2.CascadeClassifier('cat.xml')
+
 # Move the spider forward or backward. Speed -1..0 = backward, 0..1 = forward
 def Move(spd):
     if (spd>0):
@@ -89,10 +93,8 @@ def FindBrightestSpot(img,cx,cy):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (11, 11), 0)
     minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
-    x,y,v=FindBrightestSpot(img) # Get brightest spot data
     x=maxLoc[0]
     y=maxLoc[1]
-    print x,y # !!!! REMOVE
     d=np.sqrt(np.sqr(cx-x)+np.sqr(cy-y)) # Distance from center
     a=np.arctan2((y-cy),(x-cx))/eyelib.mpi # Angle (-180..180)
     return a,d,maxVal
@@ -102,6 +104,26 @@ def AverageBrightness(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return int(np.mean(gray)/2.55)
 
+# Returns list of frontal faces (rectangles)
+def GetFaces(img):    
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, flags=cv2.CASCADE_SCALE_IMAGE)
+    for (x,y,w,h) in faces:
+        fx=x+(w>>1)
+        fy=y+(h>>1)
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    return faces
+    
+# Returns list of frontal cats faces (rectangles)
+def GetCats(img):    
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    cats = cat_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, flags=cv2.CASCADE_SCALE_IMAGE)
+    for (x,y,w,h) in cats:
+        fx=x+(w>>1)
+        fy=y+(h>>1)
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    return cats
+
 # Main program
 if __name__ == '__main__':
     backlight.value=1 # Start with backlight at full brightness
@@ -109,7 +131,7 @@ if __name__ == '__main__':
     head.stop() # Be sure the robot is not moving
     
     thread.start_new_thread(eyelib.Eye, ()) # Eye thread
-    #thread.start_new_thread(dewarp.UnWarp, ()) # Unwarping thread
+    thread.start_new_thread(dewarp.UnWarp, ()) # Unwarping thread
     
     #while True: # Loop forever
     #    dewarp.img=dewarp.GetFrame() # Get new frame
@@ -118,10 +140,33 @@ if __name__ == '__main__':
     #    if (r_bump.is_pressed):
     #        print "bump!"
     o=0
+    eyelib.ChangeEye(0)
+    t=time()
     while o<15:
-        eyelib.ChangeEye(o)
-        time.sleep(10)
-        o=o+1
+        a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+        pano=dewarp.panorama.copy() # Get copy of the unwarped image
+        faces=GetFaces(pano) # Detect human faces (frontal)
+        cats=GetCats(pano) # Detect feline faces (frontal)
+        if (faces): # face(s) detected
+            pass
+        elif (cats): # humans, but cats have been detected
+            pass
+        else: # no beings to interact with
+            if (a<-10):
+                eyelib.eyeangle=0
+                eyelib.eyedistance=20
+            elif (a>10):
+                eyelib.eyeangle=180
+                eyelib.eyedistance=20
+            else:
+                eyelib.eyedistance=0
+        if ((time()-st)>8):
+            o=o+1
+            if (o<15):
+                eyelib.ChangeEye(o)
+            else:
+                eyelib.eyelid=5        
+            st=time()
     
 # !!!! DELETE AFTER GETTING DATA
 # Lines below are just for gathering some data in order to calculate the ANG_SPD value
