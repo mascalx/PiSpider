@@ -21,9 +21,10 @@ def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
     map_y = np.zeros((Hd,Wd),np.float32)
     p2=2.0*np.pi
     pm=np.pi/2.0
+    Rx=R2-R1
     for y in range(0,int(Hd-1)):
         for x in range(0,int(Wd-1)):
-            r = (float(y)/float(Hd))*(R2-R1)+R1
+            r = (float(y)/float(Hd))*Rx+R1
             theta = (float(x)/float(Wd))*p2-pm
             xS = Cx+r*np.sin(theta)
             yS = Cy+r*np.cos(theta)
@@ -34,7 +35,7 @@ def buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy):
 # Do the unwarping 
 def unwarping(img,xmap,ymap):
     output = cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)
-    return result
+    return output
     
 # Get next video frame (cv2 format)
 # Uses mjpg-streamer to create the video stream
@@ -50,8 +51,8 @@ Hd = (R2-R1)
 # Build unwarping map
 xmap,ymap = buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy)
 # First unwarp
-#img = GetFrame()
-#panorama = unwarping(img,xmap,ymap)
+img = GetFrame()
+panorama = unwarping(img,xmap,ymap)
 
 def UnWarp():
     global xmap
