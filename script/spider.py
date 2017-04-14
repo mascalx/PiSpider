@@ -95,7 +95,7 @@ def FindBrightestSpot(img,cx,cy):
     minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
     x=maxLoc[0]
     y=maxLoc[1]
-    d=np.sqrt(np.sqr(cx-x)+np.sqr(cy-y)) # Distance from center
+    d=np.sqrt(np.square(cx-x)+np.square(cy-y)) # Distance from center
     a=np.arctan2((y-cy),(x-cx))/eyelib.mpi # Angle (-180..180)
     return a,d,maxVal
 
@@ -145,42 +145,42 @@ if __name__ == '__main__':
         if (faces): # face(s) detected
             for (x,y) in faces:
                 if (x<5):
-                    eyelib.eyeangle=0
+                    eyelib.eyeangle=90
                     eyelib.eyedistance=int(-x/2)
-                    if (eyelib.eyedistance>30):
-                        eyelib.eyedistance=30
+                    if (eyelib.eyedistance>20):
+                        eyelib.eyedistance=20
                 elif (x>5):
-                    eyelib.eyeangle=180
+                    eyelib.eyeangle=270
                     eyelib.eyedistance=int(x/2)
-                    if (eyelib.eyedistance>30):
-                        eyelib.eyedistance=30
+                    if (eyelib.eyedistance>20):
+                        eyelib.eyedistance=20
                 else:
                     eyelib.eyedistance=0
         elif (cats): # no humans, but cats have been detected
             for (x,y) in cats:
                 if (x<-5):
-                    eyelib.eyeangle=0
+                    eyelib.eyeangle=90
                     eyelib.eyedistance=int(-x/2)
-                    if (eyelib.eyedistance>30):
-                        eyelib.eyedistance=30
+                    if (eyelib.eyedistance>20):
+                        eyelib.eyedistance=20
                 elif (x>5):
-                    eyelib.eyeangle=180
+                    eyelib.eyeangle=270
                     eyelib.eyedistance=int(x/2)
-                    if (eyelib.eyedistance>30):
-                        eyelib.eyedistance=30
+                    if (eyelib.eyedistance>20):
+                        eyelib.eyedistance=20
                 else:
                     eyelib.eyedistance=0
         else: # no beings to interact with so search for light
             if (a<-5):
-                eyelib.eyeangle=0
+                eyelib.eyeangle=90
                 eyelib.eyedistance=int(-a/2)
-                if (eyelib.eyedistance>30):
-                    eyelib.eyedistance=30
+                if (eyelib.eyedistance>20):
+                    eyelib.eyedistance=20
             elif (a>5):
-                eyelib.eyeangle=180
+                eyelib.eyeangle=270
                 eyelib.eyedistance=int(a/2)
-                if (eyelib.eyedistance>30):
-                    eyelib.eyedistance=30
+                if (eyelib.eyedistance>20):
+                    eyelib.eyedistance=20
             else:
                 eyelib.eyedistance=0
     
