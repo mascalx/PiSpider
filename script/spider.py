@@ -126,6 +126,22 @@ def GetCats(img):
         cats.append([fx,fy])
     return cats
 
+# Set (horizontal) looking angle for the eye
+def LookAt(a):
+    if (a<5):
+        eyelib.eyeangle=90
+        eyelib.eyedistance=int(-a/2)
+        if (eyelib.eyedistance>20):
+            eyelib.eyedistance=20
+    elif (a>5):
+        eyelib.eyeangle=270
+        eyelib.eyedistance=int(a/2)
+        if (eyelib.eyedistance>20):
+            eyelib.eyedistance=20
+    else:
+        eyelib.eyedistance=0
+    return
+
 # Main program
 if __name__ == '__main__':
     backlight.value=1 # Start with backlight at full brightness
@@ -144,45 +160,12 @@ if __name__ == '__main__':
         cats=GetCats(pano) # Detect feline faces (frontal)
         if (faces): # face(s) detected
             for (x,y) in faces:
-                if (x<5):
-                    eyelib.eyeangle=90
-                    eyelib.eyedistance=int(-x/2)
-                    if (eyelib.eyedistance>20):
-                        eyelib.eyedistance=20
-                elif (x>5):
-                    eyelib.eyeangle=270
-                    eyelib.eyedistance=int(x/2)
-                    if (eyelib.eyedistance>20):
-                        eyelib.eyedistance=20
-                else:
-                    eyelib.eyedistance=0
+                LookAt(x)
         elif (cats): # no humans, but cats have been detected
             for (x,y) in cats:
-                if (x<-5):
-                    eyelib.eyeangle=90
-                    eyelib.eyedistance=int(-x/2)
-                    if (eyelib.eyedistance>20):
-                        eyelib.eyedistance=20
-                elif (x>5):
-                    eyelib.eyeangle=270
-                    eyelib.eyedistance=int(x/2)
-                    if (eyelib.eyedistance>20):
-                        eyelib.eyedistance=20
-                else:
-                    eyelib.eyedistance=0
+                LookAt(x)
         else: # no beings to interact with so search for light
-            if (a<-5):
-                eyelib.eyeangle=90
-                eyelib.eyedistance=int(-a/2)
-                if (eyelib.eyedistance>20):
-                    eyelib.eyedistance=20
-            elif (a>5):
-                eyelib.eyeangle=270
-                eyelib.eyedistance=int(a/2)
-                if (eyelib.eyedistance>20):
-                    eyelib.eyedistance=20
-            else:
-                eyelib.eyedistance=0
+            LookAt(a)
     
 # !!!! DELETE AFTER GETTING DATA
 # Lines below are just for gathering some data in order to calculate the ANG_SPD value
