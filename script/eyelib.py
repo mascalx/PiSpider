@@ -65,6 +65,8 @@ def ChangePlate(n):
         plate = Image.open(PLATEP+plates[n]+".png")
     return    
     
+CreateEye(disp,0,0,5)
+
 # Main eye function
 def Eye():    
     global disp
