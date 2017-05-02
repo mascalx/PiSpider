@@ -153,37 +153,37 @@ if __name__ == '__main__':
     thread.start_new_thread(eyelib.Eye, ()) # Eye thread
     thread.start_new_thread(dewarp.UnWarp, ()) # Unwarping thread
     
-    while True: # Loop forever
-        if (r_bump.is_pressed):
-            print "bump!"
-        if (low_batt.value==0): # If battery is low, just stop the motors and exit
-            print "Battery low!"
-            motor.stop()
-            head.stop()
-            backlight.value=0
-            break            
-        a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-        pano=dewarp.panorama.copy() # Get copy of the unwarped image
-        faces=GetFaces(pano) # Detect human faces (frontal)
-        cats=GetCats(pano) # Detect feline faces (frontal)
-        if (faces): # face(s) detected
-            for (x,y) in faces:
-                LookAt(x)
-        elif (cats): # no humans, but cats have been detected
-            for (x,y) in cats:
-                LookAt(x)
-        else: # no beings to interact with so search for light
-            LookAt(a)
+#    while True: # Loop forever
+#        if (r_bump.is_pressed):
+#            print "bump!"
+#        if (low_batt.value==0): # If battery is low, just stop the motors and exit
+#            print "Battery low!"
+#            motor.stop()
+#            head.stop()
+#            backlight.value=0
+#            break            
+#        a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+#        pano=dewarp.panorama.copy() # Get copy of the unwarped image
+#        faces=GetFaces(pano) # Detect human faces (frontal)
+#        cats=GetCats(pano) # Detect feline faces (frontal)
+#        if (faces): # face(s) detected
+#            for (x,y) in faces:
+#                LookAt(x)
+#        elif (cats): # no humans, but cats have been detected
+#            for (x,y) in cats:
+#                LookAt(x)
+#        else: # no beings to interact with so search for light
+#            LookAt(a)
     
 # !!!! DELETE AFTER GETTING DATA
 # Lines below are just for gathering some data in order to calculate the ANG_SPD value
-#dewarp.img=dewarp.GetFrame() # Get new frame
-#a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-#print a,d,v
-#cv2.imwrite("im1.jpg",dewarp.img)
-#Rotate (10,1)
-#a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-#dewarp.img=dewarp.GetFrame() # Get new frame
-#a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
-#print a,d,v
-#cv2.imwrite("im2.jpg",dewarp.img)
+dewarp.img=dewarp.GetFrame() # Get new frame
+a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+print a,d,v
+cv2.imwrite("im1.jpg",dewarp.img)
+Rotate (10,1)
+time.sleep(1000)
+dewarp.img=dewarp.GetFrame() # Get new frame
+a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
+print a,d,v
+cv2.imwrite("im2.jpg",dewarp.img)
