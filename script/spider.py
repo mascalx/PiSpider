@@ -53,6 +53,7 @@ M_CCW = 6 # GPIO21 pin for counterclockwise rotation
 BLIGHT = 12 # GPIO12 pin for TFT backlight control
 LBUMP = 19 # GPIO19 pin for left bumper sensor
 RBUMP = 26 # GPIO26 pin for right bumper sensor
+LBO = 13 # Low battery alarm
 ANG_SPD = 100 # Angular speed for head rotation
 Facing = 0 # Current direction (approximate)
 
@@ -62,6 +63,7 @@ head = Motor(M_CKW, M_CCW, pwm=True)
 backlight = PWMLED(BLIGHT)
 l_bump = Button(LBUMP)
 r_bump = Button (RBUMP)
+low_batt = Button(LBO,pull_up=False)
 
 # Face and cat detectors
 face_cascade = cv2.CascadeClassifier('face.xml')
@@ -154,6 +156,12 @@ if __name__ == '__main__':
     while True: # Loop forever
         if (r_bump.is_pressed):
             print "bump!"
+        if (low_batt.values==0): # If battery is low, just stop the motors and exit
+            print "Battery low!"
+            motor.stop()
+            head.stop()
+            backlight.value=0
+            break            
         a,d,v=FindBrightestSpot(dewarp.img,dewarp.Cx,dewarp.Cy) # Get brightest spot data
         pano=dewarp.panorama.copy() # Get copy of the unwarped image
         faces=GetFaces(pano) # Detect human faces (frontal)
