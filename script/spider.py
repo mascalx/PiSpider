@@ -156,7 +156,7 @@ if __name__ == '__main__':
     while True: # Loop forever
         if (r_bump.is_pressed):
             print "bump!"
-        if (low_batt.values==0): # If battery is low, just stop the motors and exit
+        if (low_batt.value==0): # If battery is low, just stop the motors and exit
             print "Battery low!"
             motor.stop()
             head.stop()
