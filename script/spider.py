@@ -13,6 +13,7 @@
 #         - Face detection (dir and elev of first detected face)
 #     Left digital bumper (0..1)
 #     Right digital bumper (0..1)
+#     Low battery (0..1) 1 means battery ok
 #
 # Actuators:
 #     Legs motor (-100..+100)
