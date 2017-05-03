@@ -133,7 +133,7 @@ def GetCats(img):
 
 # Set (horizontal) looking angle for the eye
 def LookAt(a):
-    if (a<5):
+    if (a<-5):
         eyelib.eyeangle=90
         eyelib.eyedistance=int(-a/2)
         if (eyelib.eyedistance>20):
