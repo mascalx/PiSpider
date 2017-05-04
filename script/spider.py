@@ -49,8 +49,8 @@ import dewarp
 # Constants
 M_FWD = 20 # GPIO5 pin for forward movement
 M_BWD = 21 # GPIO6 pin for backward movement
-M_CKW = 5 # GPIO20 pin for clockwise rotation
-M_CCW = 6 # GPIO21 pin for counterclockwise rotation
+M_CKW = 6 # GPIO20 pin for clockwise rotation
+M_CCW = 5 # GPIO21 pin for counterclockwise rotation
 BLIGHT = 12 # GPIO12 pin for TFT backlight control
 LBUMP = 19 # GPIO19 pin for left bumper sensor
 RBUMP = 26 # GPIO26 pin for right bumper sensor
