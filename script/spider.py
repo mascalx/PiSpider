@@ -60,9 +60,7 @@ Facing = 0 # Current direction (approximate)
 
 # Actuators creation
 motor = Motor(M_FWD, M_BWD, pwm=True)
-motor.frequency = 500
 head = Motor(M_CKW, M_CCW, pwm=True)
-head.frequency = 500
 backlight = PWMLED(BLIGHT, frequency=250)
 l_bump = Button(LBUMP)
 r_bump = Button (RBUMP)
